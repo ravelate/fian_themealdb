@@ -108,6 +108,26 @@ class MealRepository(
                 detail = DataMapper.DetailMapResponseToDomain(data)
             }
         }.asFlow()
+    override fun getSearchMeal(meal: String): Flow<Resource<List<Detail>>> =
+        object : NetworkBoundResource<List<Detail>, List<DetailItem>>() {
+            var detail: List<Detail>? = null
+            override fun loadFromDB(): Flow<List<Detail>> {
+                if (detail != null){
+                    return flow{emit(detail!!)}
+                }else {
+                    return flow { emit(emptyList()) }
+                }
+            }
+
+            override fun shouldFetch(data: List<Detail>?) = true
+
+            override suspend fun createCall(): Flow<ApiResponse<List<DetailItem>>> =
+                remoteDataSource.getSearchMeal(meal)
+
+            override suspend fun saveCallResult(data: List<DetailItem>) {
+                detail = DataMapper.DetailMapResponseToDomain(data)
+            }
+        }.asFlow()
     override fun getFavoriteMeal():Flow<Resource<List<Meal>>> =
         object : NetworkBoundResource<List<Meal>, List<MealsItem>>() {
             override fun loadFromDB(): Flow<List<Meal>> {

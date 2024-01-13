@@ -28,5 +28,9 @@ interface ApiService {
     suspend fun getDetailMeal(
         @Query("i") id: Int
     ): DetailResponse
+    @GET("search.php")
+    suspend fun getSearchMeal(
+        @Query("s") meal: String
+    ): DetailResponse
 
 }

@@ -1,6 +1,7 @@
 package com.felina.fianthemealdb.feature.home
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,12 +11,16 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.felina.fianthemealdb.R
+import com.felina.fianthemealdb.core.domain.model.Meal
 import com.felina.fianthemealdb.core.ui.AreaAdapter
 import com.felina.fianthemealdb.core.ui.CategoryAdapter
 import com.felina.fianthemealdb.databinding.FragmentHomeBinding
+import com.felina.fianthemealdb.feature.detail.DetailFragment
 import com.felina.fianthemealdb.feature.meal.MealFragment
+import com.felina.fianthemealdb.feature.search.SearchFragment
 import com.felina.moviefianapp.core.data.Resource
 import org.koin.android.viewmodel.ext.android.viewModel
+import kotlin.math.log
 
 class HomeFragment : Fragment() {
 
@@ -62,7 +67,7 @@ class HomeFragment : Fragment() {
                 }
             }
         }
-        homeViewModel.area.observe(viewLifecycleOwner) {
+        homeViewModel.area.observeForever {
             when (it) {
                 is Resource.Loading -> binding.progressBar.visibility = View.VISIBLE
                 is Resource.Success -> {
@@ -100,6 +105,13 @@ class HomeFragment : Fragment() {
                     false
                 }
             searchBar.inflateMenu(R.menu.option_menu)
+            searchView
+                .editText
+                .setOnEditorActionListener { textView, actionId, event ->
+                    val findMeal = searchView.text
+                    goToDetail(findMeal.toString())
+                    false
+                }
             searchBar.setOnMenuItemClickListener {
                 // Handle menuItem click.
                 when (it.itemId) {
@@ -123,6 +135,19 @@ class HomeFragment : Fragment() {
         val fragmentManager = parentFragmentManager
         fragmentManager.beginTransaction().apply {
             replace(this@HomeFragment.id, mealFragment, MealFragment::class.java.simpleName)
+            addToBackStack(null)
+            commit()
+
+        }
+    }
+    fun goToDetail(meal: String){
+        val searchFragment = SearchFragment()
+        val bundle = Bundle()
+        bundle.putString(SearchFragment.EXTRA_DATA, meal)
+        searchFragment.arguments = bundle
+        val fragmentManager = parentFragmentManager
+        fragmentManager.beginTransaction().apply {
+            replace(this@HomeFragment.id, searchFragment, SearchFragment::class.java.simpleName)
             addToBackStack(null)
             commit()
 

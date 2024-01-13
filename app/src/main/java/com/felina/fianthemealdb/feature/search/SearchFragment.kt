@@ -1,31 +1,28 @@
-package com.felina.fianthemealdb.feature.detail
+package com.felina.fianthemealdb.feature.search
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.felina.fianthemealdb.R
 import com.felina.fianthemealdb.core.domain.model.Detail
-import com.felina.fianthemealdb.core.domain.model.Meal
 import com.felina.fianthemealdb.databinding.FragmentDetailBinding
 import com.felina.moviefianapp.core.data.Resource
 import org.koin.android.viewmodel.ext.android.viewModel
 
-
-class DetailFragment : Fragment() {
+class SearchFragment : Fragment() {
 
     private var _binding: FragmentDetailBinding? = null
-    private val detailViewModel: DetailViewModel by viewModel()
+    private val searchViewModel: SearchViewModel by viewModel()
     private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentDetailBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -33,14 +30,14 @@ class DetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         if (arguments != null) {
-            val meal = arguments?.getParcelable<Meal>(EXTRA_DATA)
+            val meal = arguments?.getString(EXTRA_DATA)
             if (meal != null) {
-                detailViewModel.getDetailMeal(meal.idMeal.toInt()).observe(viewLifecycleOwner){
+                searchViewModel.getSearchMeal(meal).observe(viewLifecycleOwner){
                     when (it) {
                         is Resource.Loading -> binding.content.progressBar.visibility = View.VISIBLE
                         is Resource.Success -> {
                             binding.content.progressBar.visibility = View.GONE
-                            it.data?.let { it1 -> showDetailMeal(it1,meal) }
+                            it.data?.let { it1 -> showSearchMeal(it1) }
                         }
 
                         is Resource.Error -> {
@@ -53,7 +50,7 @@ class DetailFragment : Fragment() {
             }
         }
     }
-    fun showDetailMeal(data: List<Detail>,meal: Meal){
+    fun showSearchMeal(data: List<Detail>){
         Glide.with(this)
             .load(data.get(0).strMealThumb)
             .into(binding.ivDetailImage)
@@ -62,13 +59,13 @@ class DetailFragment : Fragment() {
         binding.content.tvDetailArea.text = data.get(0).strArea
         binding.content.tvDetailInstruction.text = data.get(0).strInstructions
 
-        var statusFavorite = meal.isFavorite
-        setStatusFavorite(statusFavorite)
-        binding.fab.setOnClickListener {
-            statusFavorite = !statusFavorite
-            detailViewModel.setFavoriteMeal(meal, statusFavorite)
-            setStatusFavorite(statusFavorite)
-        }
+//        var statusFavorite = data.isFavorite
+//        setStatusFavorite(statusFavorite)
+//        binding.fab.setOnClickListener {
+//            statusFavorite = !statusFavorite
+//            SearchViewModel.setFavoriteMeal(meal, statusFavorite)
+//            setStatusFavorite(statusFavorite)
+//        }
 
     }
     private fun setStatusFavorite(statusFavorite: Boolean) {
@@ -78,6 +75,7 @@ class DetailFragment : Fragment() {
             binding.fab.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_not_favorite_white))
         }
     }
+
     companion object {
         var EXTRA_DATA = "extra_data"
     }

@@ -12,6 +12,7 @@ interface MealUseCase {
     fun getAllArea(): Flow<Resource<List<Area>>>
     fun getAllMeal(name: String, type: String): Flow<Resource<List<Meal>>>
     fun getDetailMeal(id: Int): Flow<Resource<List<Detail>>>
+    fun getSearchMeal(meal: String): Flow<Resource<List<Detail>>>
     fun getFavoriteMeal(): Flow<Resource<List<Meal>>>
     fun setFavoriteMeal(meal: Meal, state: Boolean)
 }

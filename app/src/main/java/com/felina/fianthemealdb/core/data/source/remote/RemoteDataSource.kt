@@ -95,4 +95,21 @@ class RemoteDataSource(private val apiService: ApiService) {
             }
         }.flowOn(Dispatchers.IO)
     }
+    suspend fun getSearchMeal(meal: String): Flow<ApiResponse<List<DetailItem>>> {
+        //get data from remote api
+        return flow {
+            try {
+                val response = apiService.getSearchMeal(meal)
+                val dataArray = response.meals
+                if (dataArray.isNotEmpty()){
+                    emit(ApiResponse.Success(response.meals))
+                } else {
+                    emit(ApiResponse.Empty)
+                }
+            } catch (e : Exception){
+                emit(ApiResponse.Error(e.toString()))
+                Log.e("RemoteDataSource", e.toString())
+            }
+        }.flowOn(Dispatchers.IO)
+    }
 }
