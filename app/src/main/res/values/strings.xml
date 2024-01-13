@@ -4,6 +4,7 @@
     <string name="choose_from_categories">Choose from Categories</string>
 
     <string name="text_primary">Sample of title text</string>
-
+    <string name="image_description">Image</string>
+    <string name="text_subtitle">Sample of subtitle text</string>
     <string name="something_wrong">Oops.. something went wrong</string>
 </resources>

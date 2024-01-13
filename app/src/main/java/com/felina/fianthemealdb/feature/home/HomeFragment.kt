@@ -12,6 +12,7 @@ import com.felina.fianthemealdb.R
 import com.felina.fianthemealdb.core.ui.AreaAdapter
 import com.felina.fianthemealdb.core.ui.CategoryAdapter
 import com.felina.fianthemealdb.databinding.FragmentHomeBinding
+import com.felina.fianthemealdb.feature.meal.MealFragment
 import com.felina.moviefianapp.core.data.Resource
 import org.koin.android.viewmodel.ext.android.viewModel
 
@@ -20,6 +21,8 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val homeViewModel: HomeViewModel by viewModel()
     private val binding get() = _binding!!
+
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,6 +37,14 @@ class HomeFragment : Fragment() {
 
         val categoryAdapter = CategoryAdapter()
         val areaAdapter = AreaAdapter()
+
+        categoryAdapter.onItemClick = { selectedData ->
+            goToMeal(selectedData.strCategory, "category")
+        }
+
+        areaAdapter.onItemClick = { selectedData ->
+            goToMeal(selectedData.strArea, "area")
+        }
 
         homeViewModel.category.observe(viewLifecycleOwner) {
             when (it) {
@@ -79,4 +90,19 @@ class HomeFragment : Fragment() {
         }
 
     }
+    fun goToMeal(name: String, type: String){
+        val mealFragment = MealFragment()
+        val bundle = Bundle()
+        bundle.putString(MealFragment.EXTRA_NAME, name)
+        bundle.putString(MealFragment.EXTRA_TYPE, type)
+        mealFragment.arguments = bundle
+        val fragmentManager = parentFragmentManager
+        fragmentManager.beginTransaction().apply {
+            replace(this@HomeFragment.id, mealFragment, MealFragment::class.java.simpleName)
+            addToBackStack(null)
+            commit()
+
+        }
+    }
+
 }

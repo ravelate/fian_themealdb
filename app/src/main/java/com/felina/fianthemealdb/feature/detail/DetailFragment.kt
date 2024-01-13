@@ -10,10 +10,6 @@ import com.felina.fianthemealdb.R
 
 class DetailFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = DetailFragment()
-    }
-
     private lateinit var viewModel: DetailViewModel
 
     override fun onCreateView(

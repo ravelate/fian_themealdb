@@ -5,21 +5,20 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.felina.fianthemealdb.R
-import com.felina.fianthemealdb.core.domain.model.Category
+import com.felina.fianthemealdb.core.domain.model.Meal
 import com.felina.fianthemealdb.databinding.ItemListCategoryBinding
 
-class CategoryAdapter : RecyclerView.Adapter<CategoryAdapter.ListViewHolder>() {
+class MealAdapter : RecyclerView.Adapter<MealAdapter.ListViewHolder>() {
 
-    private var listData = ArrayList<Category>()
-    var onItemClick: ((Category) -> Unit)? = null
-    fun setData(newListData: List<Category>?) {
+    private var listData = ArrayList<Meal>()
+    var onItemClick: ((Meal) -> Unit)? = null
+    fun setData(newListData: List<Meal>?) {
         if (newListData == null) return
-        val diffCallback = MyDiffCallback(listData, newListData)
+        val diffCallback = MealDiffCallback(listData, newListData)
         val diffResult = DiffUtil.calculateDiff(diffCallback)
 
-        listData = newListData as ArrayList<Category>
+        listData = newListData as ArrayList<Meal>
         diffResult.dispatchUpdatesTo(this)
     }
 
@@ -35,12 +34,12 @@ class CategoryAdapter : RecyclerView.Adapter<CategoryAdapter.ListViewHolder>() {
 
     inner class ListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val binding = ItemListCategoryBinding.bind(itemView)
-        fun bind(data: Category) {
+        fun bind(data: Meal) {
             with(binding) {
-                Glide.with(itemView.context)
-                    .load(data.strCategoryThumb)
+                com.bumptech.glide.Glide.with(itemView.context)
+                    .load(data.strMealThumb)
                     .into(ivItemImage)
-                tvItemTitle.text = data.strCategory
+                tvItemTitle.text = data.strMeal
             }
         }
 

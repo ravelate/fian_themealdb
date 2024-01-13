@@ -5,8 +5,10 @@ import com.felina.fianthemealdb.core.data.source.remote.RemoteDataSource
 import com.felina.fianthemealdb.core.data.source.remote.network.ApiResponse
 import com.felina.fianthemealdb.core.data.source.remote.response.AreaItem
 import com.felina.fianthemealdb.core.data.source.remote.response.CategoriesItem
+import com.felina.fianthemealdb.core.data.source.remote.response.MealsItem
 import com.felina.fianthemealdb.core.domain.model.Area
 import com.felina.fianthemealdb.core.domain.model.Category
+import com.felina.fianthemealdb.core.domain.model.Meal
 import com.felina.fianthemealdb.core.domain.repository.IMealRepository
 import com.felina.moviefianapp.core.data.NetworkBoundResource
 import com.felina.moviefianapp.core.data.Resource
@@ -36,7 +38,7 @@ class MealRepository(
 
             override suspend fun saveCallResult(data: List<CategoriesItem>) {
                 val categoryList = DataMapper.CategorymapResponsesToEntities(data)
-                appExecutors.networkIO().execute {
+                appExecutors.diskIO().execute {
                     localDataSource.insertCategory(categoryList)
                 }
             }
@@ -57,9 +59,38 @@ class MealRepository(
 
             override suspend fun saveCallResult(data: List<AreaItem>) {
                 val areaList = DataMapper.AreamapResponsesToEntities(data)
-                appExecutors.networkIO().execute{
+                appExecutors.diskIO().execute{
                     localDataSource.insertArea(areaList)
                 }
             }
         }.asFlow()
+
+    override fun getAllMeal(name: String, type: String): Flow<Resource<List<Meal>>> =
+        object : NetworkBoundResource<List<Meal>, List<MealsItem>>() {
+            override fun loadFromDB(): Flow<List<Meal>> {
+                return localDataSource.getAllMeal().map {
+                    DataMapper.MealmapEntitiesToDomain(it)
+                }
+            }
+
+            override fun shouldFetch(data: List<Meal>?) = true
+
+            override suspend fun createCall(): Flow<ApiResponse<List<MealsItem>>> =
+                remoteDataSource.getAllMeal(name, type)
+
+            override suspend fun saveCallResult(data: List<MealsItem>) {
+                val mealList = DataMapper.MealmapResponsesToEntities(data)
+                appExecutors.diskIO().execute{
+                    localDataSource.insertMeal(mealList)
+                }
+            }
+        }.asFlow()
+
+    override fun getFavoriteMeal(): Flow<Resource<List<Meal>>> {
+        TODO("Not yet implemented")
+    }
+
+    override fun setFavoriteMeal(meal: Meal, state: Boolean) {
+        TODO("Not yet implemented")
+    }
 }

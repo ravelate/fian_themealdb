@@ -1,32 +1,67 @@
 package com.felina.fianthemealdb.feature.meal
 
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.felina.fianthemealdb.R
+import com.felina.fianthemealdb.core.ui.MealAdapter
+import com.felina.fianthemealdb.databinding.FragmentMealBinding
+import com.felina.moviefianapp.core.data.Resource
+import org.koin.android.viewmodel.ext.android.viewModel
 
 class MealFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = MealFragment()
-    }
-
-    private lateinit var viewModel: MealViewModel
+    private var _binding: FragmentMealBinding? = null
+    private val mealViewModel: MealViewModel by viewModel()
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_meal, container, false)
+    ): View {
+        _binding = FragmentMealBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        if (arguments != null) {
+            val name = arguments?.getString(EXTRA_NAME)
+            val type = arguments?.getString(EXTRA_TYPE)
+
+            val mealAdapter = MealAdapter()
+
+            mealViewModel.getAllMeal(name,type).observe(viewLifecycleOwner) {
+                when (it) {
+                    is Resource.Loading -> binding.progressBar.visibility = View.VISIBLE
+                    is Resource.Success -> {
+                        binding.progressBar.visibility = View.GONE
+                        mealAdapter.setData(it.data)
+                    }
+
+                    is Resource.Error -> {
+                        binding.progressBar.visibility = View.GONE
+                        binding.viewError.root.visibility = View.VISIBLE
+                        binding.viewError.tvError.text = getString(R.string.something_wrong)
+                    }
+                }
+            }
+            with(binding.rvMeal) {
+                layoutManager = LinearLayoutManager(context)
+                setHasFixedSize(true)
+                adapter = mealAdapter
+            }
+        }else {
+            binding.viewError.tvError.text = getString(R.string.something_wrong)
+        }
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(MealViewModel::class.java)
-        // TODO: Use the ViewModel
+    companion object {
+        var EXTRA_NAME = "extra_name"
+        var EXTRA_TYPE = "extra_type"
     }
 
 }
