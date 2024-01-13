@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Fian TheMealDB</string>
+    <string name="choose_from_area">Choose from Area</string>
+    <string name="choose_from_categories">Choose from Categories</string>
+
+    <string name="text_primary">Sample of title text</string>
+
+    <string name="something_wrong">Oops.. something went wrong</string>
+</resources>
