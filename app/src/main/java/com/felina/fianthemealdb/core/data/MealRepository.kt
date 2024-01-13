@@ -108,9 +108,23 @@ class MealRepository(
                 detail = DataMapper.DetailMapResponseToDomain(data)
             }
         }.asFlow()
-    override fun getFavoriteMeal(): Flow<Resource<List<Meal>>> {
-        TODO("Not yet implemented")
-    }
+    override fun getFavoriteMeal():Flow<Resource<List<Meal>>> =
+        object : NetworkBoundResource<List<Meal>, List<MealsItem>>() {
+            override fun loadFromDB(): Flow<List<Meal>> {
+                return localDataSource.getFavoriteMeal().map {
+                    DataMapper.MealmapEntitiesToDomain(it)
+                }
+            }
+
+            override fun shouldFetch(data: List<Meal>?) = false
+
+            override suspend fun createCall(): Flow<ApiResponse<List<MealsItem>>> =
+                remoteDataSource.getAllMeal("Canada", "area")
+
+            override suspend fun saveCallResult(data: List<MealsItem>) {
+
+            }
+        }.asFlow()
 
     override fun setFavoriteMeal(meal: Meal, state: Boolean) {
         val mealEntity = DataMapper.MealmapDomainToEntity(meal)

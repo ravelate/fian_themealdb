@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.felina.fianthemealdb.R
@@ -29,6 +30,7 @@ class MealFragment : Fragment() {
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        (activity as AppCompatActivity).supportActionBar?.hide()
         if (arguments != null) {
             val name = arguments?.getString(EXTRA_NAME)
             val type = arguments?.getString(EXTRA_TYPE)
@@ -37,22 +39,40 @@ class MealFragment : Fragment() {
             mealAdapter.onItemClick = { selectedData ->
                 goToDetail(selectedData)
             }
+            if (type=="favorite"){
+                mealViewModel.favorite.observe(viewLifecycleOwner) {
+                    when (it) {
+                        is Resource.Loading -> binding.progressBar.visibility = View.VISIBLE
+                        is Resource.Success -> {
+                            binding.progressBar.visibility = View.GONE
+                            mealAdapter.setData(it.data)
+                        }
 
-            mealViewModel.getAllMeal(name,type).observe(viewLifecycleOwner) {
-                when (it) {
-                    is Resource.Loading -> binding.progressBar.visibility = View.VISIBLE
-                    is Resource.Success -> {
-                        binding.progressBar.visibility = View.GONE
-                        mealAdapter.setData(it.data)
+                        is Resource.Error -> {
+                            binding.progressBar.visibility = View.GONE
+                            binding.viewError.root.visibility = View.VISIBLE
+                            binding.viewError.tvError.text = getString(R.string.something_wrong)
+                        }
                     }
+                }
+            }else {
+                mealViewModel.getAllMeal(name,type).observe(viewLifecycleOwner) {
+                    when (it) {
+                        is Resource.Loading -> binding.progressBar.visibility = View.VISIBLE
+                        is Resource.Success -> {
+                            binding.progressBar.visibility = View.GONE
+                            mealAdapter.setData(it.data)
+                        }
 
-                    is Resource.Error -> {
-                        binding.progressBar.visibility = View.GONE
-                        binding.viewError.root.visibility = View.VISIBLE
-                        binding.viewError.tvError.text = getString(R.string.something_wrong)
+                        is Resource.Error -> {
+                            binding.progressBar.visibility = View.GONE
+                            binding.viewError.root.visibility = View.VISIBLE
+                            binding.viewError.tvError.text = getString(R.string.something_wrong)
+                        }
                     }
                 }
             }
+
             with(binding.rvMeal) {
                 layoutManager = LinearLayoutManager(context)
                 setHasFixedSize(true)

@@ -8,4 +8,7 @@
     <string name="text_subtitle">Sample of subtitle text</string>
     <string name="something_wrong">Oops.. something went wrong</string>
     <string name="menu_favorite">Favorite\n</string>
+    <string name="search">Search Meal\n</string>
+    <string name="favorite">My Favorite\n</string>
+    <string name="searchbar_hint">Search Meal</string>
 </resources>

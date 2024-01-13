@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -34,7 +35,7 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        (activity as AppCompatActivity).supportActionBar?.show()
         val categoryAdapter = CategoryAdapter()
         val areaAdapter = AreaAdapter()
 
@@ -89,8 +90,45 @@ class HomeFragment : Fragment() {
             adapter = categoryAdapter
         }
 
+        with(binding) {
+            searchView.setupWithSearchBar(searchBar)
+            searchView
+                .editText
+                .setOnEditorActionListener { textView, actionId, event ->
+                    searchBar.textView.text = searchView.text
+                    searchView.hide()
+                    false
+                }
+            searchBar.inflateMenu(R.menu.option_menu)
+            searchBar.setOnMenuItemClickListener {
+                // Handle menuItem click.
+                when (it.itemId) {
+                    R.id.favorite -> {
+                        goToFavorite("Chicken", "favorite")
+                      true
+                    }
+                    else -> true
+                }
+            }
+        }
+
     }
+
     fun goToMeal(name: String, type: String){
+        val mealFragment = MealFragment()
+        val bundle = Bundle()
+        bundle.putString(MealFragment.EXTRA_NAME, name)
+        bundle.putString(MealFragment.EXTRA_TYPE, type)
+        mealFragment.arguments = bundle
+        val fragmentManager = parentFragmentManager
+        fragmentManager.beginTransaction().apply {
+            replace(this@HomeFragment.id, mealFragment, MealFragment::class.java.simpleName)
+            addToBackStack(null)
+            commit()
+
+        }
+    }
+    fun goToFavorite(name: String, type: String){
         val mealFragment = MealFragment()
         val bundle = Bundle()
         bundle.putString(MealFragment.EXTRA_NAME, name)

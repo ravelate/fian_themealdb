@@ -12,4 +12,5 @@ class MealViewModel(private val mealUseCase: MealUseCase) : ViewModel() {
     fun getAllMeal(name: String?, type: String?): LiveData<Resource<List<Meal>>> {
         return mealUseCase.getAllMeal(name.toString(),type.toString()).asLiveData()
     }
+    val favorite = mealUseCase.getFavoriteMeal().asLiveData()
 }
