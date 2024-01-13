@@ -5,9 +5,11 @@ import com.felina.fianthemealdb.core.data.source.remote.RemoteDataSource
 import com.felina.fianthemealdb.core.data.source.remote.network.ApiResponse
 import com.felina.fianthemealdb.core.data.source.remote.response.AreaItem
 import com.felina.fianthemealdb.core.data.source.remote.response.CategoriesItem
+import com.felina.fianthemealdb.core.data.source.remote.response.DetailItem
 import com.felina.fianthemealdb.core.data.source.remote.response.MealsItem
 import com.felina.fianthemealdb.core.domain.model.Area
 import com.felina.fianthemealdb.core.domain.model.Category
+import com.felina.fianthemealdb.core.domain.model.Detail
 import com.felina.fianthemealdb.core.domain.model.Meal
 import com.felina.fianthemealdb.core.domain.repository.IMealRepository
 import com.felina.moviefianapp.core.data.NetworkBoundResource
@@ -15,6 +17,7 @@ import com.felina.moviefianapp.core.data.Resource
 import com.felina.moviefianapp.core.utils.AppExecutors
 import com.felina.moviefianapp.core.utils.DataMapper
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
 class MealRepository(
@@ -85,12 +88,32 @@ class MealRepository(
                 }
             }
         }.asFlow()
+    override fun getDetailMeal(id: Int): Flow<Resource<List<Detail>>> =
+        object : NetworkBoundResource<List<Detail>, List<DetailItem>>() {
+            var detail: List<Detail>? = null
+            override fun loadFromDB(): Flow<List<Detail>> {
+                if (detail != null){
+                    return flow{emit(detail!!)}
+                }else {
+                    return flow { emit(emptyList()) }
+                }
+            }
 
+            override fun shouldFetch(data: List<Detail>?) = true
+
+            override suspend fun createCall(): Flow<ApiResponse<List<DetailItem>>> =
+                remoteDataSource.getDetailMeal(id)
+
+            override suspend fun saveCallResult(data: List<DetailItem>) {
+                detail = DataMapper.DetailMapResponseToDomain(data)
+            }
+        }.asFlow()
     override fun getFavoriteMeal(): Flow<Resource<List<Meal>>> {
         TODO("Not yet implemented")
     }
 
     override fun setFavoriteMeal(meal: Meal, state: Boolean) {
-        TODO("Not yet implemented")
+        val mealEntity = DataMapper.MealmapDomainToEntity(meal)
+        appExecutors.diskIO().execute { localDataSource.setFavoriteMeal(mealEntity, state) }
     }
 }

@@ -1,15 +1,16 @@
 package com.felina.fianthemealdb.feature.meal
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.felina.fianthemealdb.R
+import com.felina.fianthemealdb.core.domain.model.Meal
 import com.felina.fianthemealdb.core.ui.MealAdapter
 import com.felina.fianthemealdb.databinding.FragmentMealBinding
+import com.felina.fianthemealdb.feature.detail.DetailFragment
 import com.felina.moviefianapp.core.data.Resource
 import org.koin.android.viewmodel.ext.android.viewModel
 
@@ -33,6 +34,9 @@ class MealFragment : Fragment() {
             val type = arguments?.getString(EXTRA_TYPE)
 
             val mealAdapter = MealAdapter()
+            mealAdapter.onItemClick = { selectedData ->
+                goToDetail(selectedData)
+            }
 
             mealViewModel.getAllMeal(name,type).observe(viewLifecycleOwner) {
                 when (it) {
@@ -58,7 +62,19 @@ class MealFragment : Fragment() {
             binding.viewError.tvError.text = getString(R.string.something_wrong)
         }
     }
+    fun goToDetail(meal: Meal){
+        val detailFragment = DetailFragment()
+        val bundle = Bundle()
+        bundle.putParcelable(DetailFragment.EXTRA_DATA, meal)
+        detailFragment.arguments = bundle
+        val fragmentManager = parentFragmentManager
+        fragmentManager.beginTransaction().apply {
+            replace(this@MealFragment.id, detailFragment, DetailFragment::class.java.simpleName)
+            addToBackStack(null)
+            commit()
 
+        }
+    }
     companion object {
         var EXTRA_NAME = "extra_name"
         var EXTRA_TYPE = "extra_type"

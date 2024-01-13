@@ -8,6 +8,7 @@ class MealInteractor(private val mealRepository: IMealRepository): MealUseCase {
     override fun getAllCategory() = mealRepository.getAllCategory()
     override fun getAllArea() = mealRepository.getAllArea()
     override fun getAllMeal(name: String, type: String) = mealRepository.getAllMeal(name, type)
+    override fun getDetailMeal(id: Int) = mealRepository.getDetailMeal(id)
     override fun getFavoriteMeal() = mealRepository.getFavoriteMeal()
     override fun setFavoriteMeal(meal: Meal, state: Boolean) = mealRepository.setFavoriteMeal(meal, state)
 

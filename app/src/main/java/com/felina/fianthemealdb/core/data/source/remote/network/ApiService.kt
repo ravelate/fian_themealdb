@@ -2,6 +2,7 @@ package com.felina.fianthemealdb.core.data.source.remote.network
 
 import com.felina.fianthemealdb.core.data.source.remote.response.AreaResponse
 import com.felina.fianthemealdb.core.data.source.remote.response.CategoryResponse
+import com.felina.fianthemealdb.core.data.source.remote.response.DetailResponse
 import com.felina.fianthemealdb.core.data.source.remote.response.MealResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -22,5 +23,10 @@ interface ApiService {
     suspend fun getMealByArea(
         @Query("a") meal: String
     ): MealResponse
+
+    @GET("lookup.php")
+    suspend fun getDetailMeal(
+        @Query("i") id: Int
+    ): DetailResponse
 
 }

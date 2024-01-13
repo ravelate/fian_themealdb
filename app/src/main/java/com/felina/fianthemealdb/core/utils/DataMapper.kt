@@ -5,9 +5,12 @@ import com.felina.fianthemealdb.core.data.source.local.entity.CategoryEntity
 import com.felina.fianthemealdb.core.data.source.local.entity.MealEntity
 import com.felina.fianthemealdb.core.data.source.remote.response.AreaItem
 import com.felina.fianthemealdb.core.data.source.remote.response.CategoriesItem
+import com.felina.fianthemealdb.core.data.source.remote.response.DetailItem
+import com.felina.fianthemealdb.core.data.source.remote.response.DetailResponse
 import com.felina.fianthemealdb.core.data.source.remote.response.MealsItem
 import com.felina.fianthemealdb.core.domain.model.Area
 import com.felina.fianthemealdb.core.domain.model.Category
+import com.felina.fianthemealdb.core.domain.model.Detail
 import com.felina.fianthemealdb.core.domain.model.Meal
 
 object DataMapper {
@@ -69,6 +72,24 @@ object DataMapper {
                 idMeal = it.idMeal,
                 strMeal = it.strMeal,
                 isFavorite = it.isFavorite
+            )
+        }
+    fun MealmapDomainToEntity(input: Meal) = MealEntity(
+        strMealThumb = input.strMealThumb,
+        idMeal = input.idMeal,
+        strMeal = input.strMeal,
+        isFavorite = input.isFavorite
+    )
+    fun DetailMapResponseToDomain(res: List<DetailItem>): List<Detail> =
+        res.map {
+            Detail(
+                strMeal = it.strMeal,
+                strMealThumb = it.strMealThumb,
+                strArea = it.strArea,
+                strCategory = it.strCategory,
+                strInstructions = it.strInstructions,
+                strYoutube = it.strYoutube,
+                idMeal = it.idMeal,
             )
         }
 }

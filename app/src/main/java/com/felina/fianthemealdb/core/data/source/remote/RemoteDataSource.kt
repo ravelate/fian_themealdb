@@ -5,6 +5,7 @@ import com.felina.fianthemealdb.core.data.source.remote.network.ApiResponse
 import com.felina.fianthemealdb.core.data.source.remote.network.ApiService
 import com.felina.fianthemealdb.core.data.source.remote.response.AreaItem
 import com.felina.fianthemealdb.core.data.source.remote.response.CategoriesItem
+import com.felina.fianthemealdb.core.data.source.remote.response.DetailItem
 import com.felina.fianthemealdb.core.data.source.remote.response.MealResponse
 import com.felina.fianthemealdb.core.data.source.remote.response.MealsItem
 import kotlinx.coroutines.Dispatchers
@@ -71,6 +72,23 @@ class RemoteDataSource(private val apiService: ApiService) {
                         emit(ApiResponse.Empty)
                     }
                 }
+            } catch (e : Exception){
+                emit(ApiResponse.Error(e.toString()))
+                Log.e("RemoteDataSource", e.toString())
+            }
+        }.flowOn(Dispatchers.IO)
+    }
+    suspend fun getDetailMeal(id: Int): Flow<ApiResponse<List<DetailItem>>> {
+        //get data from remote api
+        return flow {
+            try {
+                    val response = apiService.getDetailMeal(id)
+                    val dataArray = response.meals
+                    if (dataArray.isNotEmpty()){
+                        emit(ApiResponse.Success(response.meals))
+                    } else {
+                        emit(ApiResponse.Empty)
+                    }
             } catch (e : Exception){
                 emit(ApiResponse.Error(e.toString()))
                 Log.e("RemoteDataSource", e.toString())
